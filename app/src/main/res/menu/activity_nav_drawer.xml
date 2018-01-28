@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:showIn="navigation_view">
+
+    <group >
+
+        <item
+            android:id="@+id/nav_on_off"
+            android:icon="@drawable/ic_visibility_black_48dp"
+            android:title="OFF"
+            app:actionLayout="@layout/switch_menu"
+
+            />
+
+        <item
+            android:id="@+id/nav_pause"
+            android:icon="@drawable/ic_pause_circle_outline_black_48dp"
+            android:title="Pause 1 min" />
+        <item
+            android:id="@+id/nav_stop"
+            android:icon="@drawable/ic_cancel_black_48dp"
+            android:title="Stop" />
+        <item
+            android:id="@+id/nav_setting"
+            android:icon="@drawable/ic_settings_black_48dp"
+            android:title="Settings" />
+        <item
+            android:id="@+id/nav_howtouse"
+            android:icon="@drawable/ic_live_help_black_48dp"
+            android:title="How to use"/>
+    </group>
+
+    <item android:title="Profile">
+        <menu>
+            <item
+                android:id="@+id/nav_default"
+                android:icon="@drawable/ic_brightness_4_black_48dp"
+                android:title="Default" />
+            <item
+                android:id="@+id/nav_nightWalk"
+                android:icon="@drawable/ic_directions_walk_black_48dp"
+                android:title="Night Walk" />
+            <item
+                android:id="@+id/nav_bedReading"
+                android:icon="@drawable/ic_hotel_black_48dp"
+                android:title="Bed reading" />
+        </menu>
+    </item>
+
+</menu>

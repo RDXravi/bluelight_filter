@@ -2,12 +2,10 @@ package com.rdx.pirate.bluelight_filter;
 
 import android.app.ActivityManager;
 import android.app.AlarmManager;
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.ComponentCallbacks2;
 import android.content.SharedPreferences;
-import android.graphics.PixelFormat;
 import android.graphics.drawable.GradientDrawable;
 import android.content.Context;
 import android.content.Intent;
@@ -15,14 +13,11 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -32,7 +27,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -72,7 +66,7 @@ public class navActivity extends AppCompatActivity
 
     public Intent intent;
 
-    private FloatingActionButton fb_on_off;
+    public static FloatingActionButton fb_on_off;
     private SharedPreferences.Editor editor;
 
     private SharedPreferences sharedPreferences;
@@ -306,25 +300,9 @@ public class navActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
 
+                pauseFunction();
 
-                if(!sharedPreferences.getBoolean("isPause", Boolean.parseBoolean(null)) && sharedPreferences.getBoolean("isOnNightmode", Boolean.parseBoolean(null))){
-                    filterService.pauseFilter();
-                    editor.putBoolean("isPause", true);
-                    editor.apply();
 
-                    pause_text.setText("Cancel Pause");
-                    pause_text.setTextColor(Color.RED);
-                    Log.d("1","first");
-                }else if(sharedPreferences.getBoolean("isPause", Boolean.parseBoolean(null)) && sharedPreferences.getBoolean("isOnNightmode", Boolean.parseBoolean(null))){
-
-                    pause_text.setText("Pause for 1 minute");
-                    pause_text.setTextColor(Color.BLACK);
-                    editor.putBoolean("isPause", false);
-                    editor.apply();
-                    filterService.handler.removeCallbacks(filterService.runner);
-                    filterService.startFilter();
-                    Log.d("1","second");
-                }
             }
         });
 
@@ -452,20 +430,7 @@ public class navActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
 
-                if(!sharedPreferences.getBoolean("isOnNightmode", Boolean.parseBoolean(null))){
-
-         //           startService(intent);
-                    startservice();
-                    Snackbar.make(view, "Night mode activated", Snackbar.LENGTH_SHORT)
-                            .setAction("Action", null).show();
-
-                }else {
-
-                    stopservice();
-                    Snackbar.make(view, "Night mode Deactivated", Snackbar.LENGTH_SHORT)
-                            .setAction("Action", null).show();
-
-                }
+               activate_deactivate_filter(view);
 
             }
         });
@@ -486,34 +451,78 @@ public class navActivity extends AppCompatActivity
 
         Menu mn = navigationView.getMenu();
         on_off = mn.findItem(R.id.nav_on_off);
+
+
        /* if(isOnNightMode){
             on_off.setTitle("ON");
         }*/
+
+
+
+    }
+
+    private void activate_deactivate_filter(View view) {
+        if(!sharedPreferences.getBoolean("isOnNightmode", Boolean.parseBoolean(null))){
+
+            //           startService(intent);
+            startservice();
+            Snackbar.make(view, "Night mode activated", Snackbar.LENGTH_SHORT)
+                    .setAction("Action", null).show();
+
+        }else {
+
+            stopservice();
+            Snackbar.make(view, "Night mode Deactivated", Snackbar.LENGTH_SHORT)
+                    .setAction("Action", null).show();
+
+        }
+
+    }
+
+    private void activate_deactivate_filter() {
+        if(!sharedPreferences.getBoolean("isOnNightmode", Boolean.parseBoolean(null))){
+
+            //           startService(intent);
+            startservice();
+
+        }else {
+
+            stopservice();
+
+        }
+
+    }
+
+
+    private void pauseFunction(){
+
+
+        if(!sharedPreferences.getBoolean("isPause", Boolean.parseBoolean(null)) && sharedPreferences.getBoolean("isOnNightmode", Boolean.parseBoolean(null))){
+            filterService.pauseFilter();
+            editor.putBoolean("isPause", true);
+            editor.apply();
+
+            pause_text.setText("Cancel Pause");
+            pause_text.setTextColor(Color.RED);
+            Log.d("1","first");
+        }else if(sharedPreferences.getBoolean("isPause", Boolean.parseBoolean(null)) && sharedPreferences.getBoolean("isOnNightmode", Boolean.parseBoolean(null))){
+
+            pause_text.setText("Pause for 1 minute");
+            pause_text.setTextColor(Color.BLACK);
+            editor.putBoolean("isPause", false);
+            editor.apply();
+            filterService.handler.removeCallbacks(filterService.runner);
+            filterService.startFilter();
+            Log.d("1","second");
+        }
+
     }
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public static MenuItem on_off;
+    private MenuItem on_off;
 
     //drawer back button functionality
     @Override
@@ -563,19 +572,17 @@ public class navActivity extends AppCompatActivity
 
 
         if (id == R.id.nav_on_off) {
-           /* if(isOnNightMode){
-                stopservice();
 
-            }else{
-
-                startservice();
-            }*/
-
+            activate_deactivate_filter();
             // Handle the camera action
         } else if (id == R.id.nav_pause) {
 
+            pauseFunction();
+
         } else if (id == R.id.nav_stop) {
-            stopservice();
+
+            stopService(intent);
+            finish();
 
         } else if (id == R.id.nav_setting) {
 
@@ -589,7 +596,7 @@ public class navActivity extends AppCompatActivity
 
         }
 
-        if (id != R.id.nav_on_off) {
+        if (id != R.id.nav_on_off || id!=R.id.nav_pause) {
 
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             drawer.closeDrawer(GravityCompat.START);
@@ -619,7 +626,7 @@ public class navActivity extends AppCompatActivity
         progress_screendim = 40;
         //seekbar_screendim.setProgress(progress_screendim);
 
-        if(sharedPreferences.getBoolean("appCrash", Boolean.parseBoolean(null))){
+        if(sharedPreferences.getBoolean("appCrash", Boolean.parseBoolean(null)) && !isMyServiceRunning(filterService.class)){
             editor.putBoolean("isOnNightmode", false);
             editor.putBoolean("isPause", false);
             editor.apply();
@@ -639,9 +646,16 @@ public class navActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        loadDefaults();
+    }
+
+    @Override
     protected void onDestroy() {
         //stopService(new Intent(this, filterService.class));
         super.onDestroy();
+        finish();
         System.gc();
         Runtime.getRuntime().gc();
     }

@@ -37,6 +37,7 @@
 
             android:label="@string/app_name" />
 
+        <service android:name=".filterService$NotificationActionService"/>
 
         <receiver android:name=".upCustomTimer"/>
 

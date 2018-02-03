@@ -44,13 +44,21 @@ public class filterService extends Service {
 
     private Notification notification;
 
+    private Intent action1Intent;
+    private Intent action1Intent2;
+    private Intent action1Intent3;
+
+    private PendingIntent action1PendingIntent;
+    private PendingIntent action1PendingIntent2;
+    private PendingIntent action1PendingIntent3;
+
     private static SharedPreferences sharedPreferences;
 
     private static SharedPreferences.Editor editor;
 
     private static WindowManager.LayoutParams params;
 
-    private int height;
+    private  int height;
     private int width;
 
 
@@ -80,54 +88,27 @@ public class filterService extends Service {
 
         editor.putBoolean("appCrash", true);
         editor.apply();
-        Boolean test = sharedPreferences.getBoolean("test", Boolean.parseBoolean(null));
-
-        Log.d("dd", "oncreate worked" + test);
-        if (linearLayout == null) {
-            linearLayout = new LinearLayout(getApplicationContext());
-
-        }
-
-        if (window == null) {
 
 
-            window = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-            Display display = window.getDefaultDisplay();
-            width = display.getWidth();
-            height = display.getHeight();
 
-            params = new WindowManager.LayoutParams(
-                    (height + width),
-                    (height + width),
-                    WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
-                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                            | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                            | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                            | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-                            | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
-                    PixelFormat.TRANSLUCENT
-            );
-
-        }
-
-        Intent action1Intent = new Intent(this, NotificationActionService.class)
+        action1Intent = new Intent(this, NotificationActionService.class)
                 .setAction(ACTION_1);
 
-        PendingIntent action1PendingIntent = PendingIntent.getService(this, 0,
+        action1PendingIntent = PendingIntent.getService(this, 0,
                 action1Intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
-        Intent action1Intent2 = new Intent(this, NotificationActionService.class)
+        action1Intent2 = new Intent(this, NotificationActionService.class)
                 .setAction(ACTION_2);
 
-        PendingIntent action1PendingIntent2 = PendingIntent.getService(this, 0,
+        action1PendingIntent2 = PendingIntent.getService(this, 0,
                 action1Intent2, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
-        Intent action1Intent3 = new Intent(this, NotificationActionService.class)
+        action1Intent3 = new Intent(this, NotificationActionService.class)
                 .setAction(ACTION_3);
 
-        PendingIntent action1PendingIntent3 = PendingIntent.getService(this, 0,
+        action1PendingIntent3 = PendingIntent.getService(this, 0,
                 action1Intent3, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
@@ -137,11 +118,12 @@ public class filterService extends Service {
                     .setContentTitle("BlueLight Filter")
                     .setContentText("Click to stop")
                     .setSmallIcon(R.drawable.ic_pause_white_48dp)
+                    .setAutoCancel(true)
                     .addAction(R.drawable.no_icon, "ON/OFF", action1PendingIntent)
                     .addAction(R.drawable.no_icon, "Pause", action1PendingIntent2)
                     .addAction(R.drawable.no_icon, "Settings", action1PendingIntent3)
                     .build();
-            notification.flags = Notification.FLAG_AUTO_CANCEL;
+
 
 
         }
@@ -152,7 +134,7 @@ public class filterService extends Service {
 
         startForeground(101, notification);
 
-        Log.d("service", "filter service");
+
 
 
 
@@ -252,8 +234,12 @@ public class filterService extends Service {
 
     private static Intent settings_intent;
 
+    private static Intent closeNotification = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
 
 
+
+
+    private Display display;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -262,6 +248,50 @@ public class filterService extends Service {
 
         editor.putBoolean("isOnNightmode", true);
         editor.apply();
+
+
+
+
+        if (linearLayout == null) {
+            linearLayout = new LinearLayout(getApplicationContext());
+
+        }
+
+        if (params == null) {
+
+
+            window = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+            display = window.getDefaultDisplay();
+            width = display.getWidth();
+            height = display.getHeight();
+
+            if(sharedPreferences.getBoolean("paramFull", Boolean.parseBoolean(null))) {
+
+
+
+                params = new WindowManager.LayoutParams(
+                        (height + width),
+                        (height + width),
+                        WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
+                        WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                                | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                                | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                                | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+                                | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                        PixelFormat.TRANSLUCENT
+
+                );
+                Log.d("f","first bracket");
+
+            }else{
+                params = new WindowManager.LayoutParams(
+                        WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
+                        0 | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN, PixelFormat.TRANSLUCENT);
+
+                Log.d("f","second bracket");
+
+            }
+        }
 //        Log.d("vlaoe","crash at "+(sharedPreferences.getString("color", "1978150400")));
         linearLayout.setBackgroundColor((sharedPreferences.getInt("color", 1978150400)));
 
@@ -341,6 +371,10 @@ public class filterService extends Service {
 
         public static void stopFilter(){
 
+
+
+
+
             if(linearLayout!=null && !sharedPreferences.getBoolean("isPause", Boolean.parseBoolean(null))) {
                 //linearLayout.setBackgroundColor(Color.TRANSPARENT);
 
@@ -371,6 +405,7 @@ public class filterService extends Service {
 
                 editor.putBoolean("isOnNightmode", true);
                 editor.apply();
+
 
 
 
@@ -440,6 +475,8 @@ public class filterService extends Service {
             }
 
 
+            this.sendBroadcast(closeNotification);
+
 
         }
 
@@ -456,20 +493,52 @@ public class filterService extends Service {
         super.onDestroy();
         Log.d("hh","destroy called");
 
+        stopService(new Intent(this, NotificationActionService.class));
         if(sharedPreferences.getBoolean("isOnNightmode", Boolean.parseBoolean(null))){
 
 
 
 
-            window.removeView(linearLayout);
+            try {
+                window.removeView(linearLayout);
+            }catch (Exception e){
+
+            }
             stopSelf();
 
         }
 
+
+        try{
+            window.removeView(linearLayout);
+        }catch (Exception e){
+
+        }
+
+        linearLayout = null;
+        window = null;
+        params = null;
+        display = null;
+        runner = null;
+        start_stop_filter_runnable = null;
+        pausefilter_runnable = null;
+        settings_intent = null;
+        action1Intent=null;
+        action1Intent2=null;
+        action1Intent3=null;
+        action1PendingIntent = null;
+        action1PendingIntent2 = null;
+        action1PendingIntent3 = null;
+
+
+
+
+
+
+
+
         editor.putBoolean("isOnNightmode", false);
-        editor.apply();
-
-
+        editor.putBoolean("isPause", false);
         editor.putBoolean("appCrash", false);
         editor.apply();
 
@@ -479,6 +548,8 @@ public class filterService extends Service {
             navActivity.pause_text.setTextColor(Color.BLACK);
         }
 
+        System.gc();
+        Runtime.getRuntime().gc();
 
         /*Log.d("service","filter servbice stops");
         if(isOnNightMode)

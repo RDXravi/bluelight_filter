@@ -73,6 +73,7 @@ public class navActivity extends AppCompatActivity
 
     private int check_press = 0;
     public static TextView pause_text;
+    public static Intent filter_intent;
 
 
     @Override
@@ -150,6 +151,11 @@ public class navActivity extends AppCompatActivity
         final GradientDrawable preview_colorTemperature = (GradientDrawable)img_ColorTemperature.getBackground();
         final GradientDrawable preview_intensity = (GradientDrawable)img_intensity.getBackground();
         final GradientDrawable preview_screendim = (GradientDrawable)img_screendim.getBackground();
+
+
+        LinearLayout pause = (LinearLayout)findViewById(R.id.pause_min);
+        pause_text = (TextView)findViewById(R.id.pause_text);
+
 
 
         //load defaults
@@ -291,8 +297,7 @@ public class navActivity extends AppCompatActivity
 
 
         //Pause button functions
-        LinearLayout pause = (LinearLayout)findViewById(R.id.pause_min);
-        pause_text = (TextView)findViewById(R.id.pause_text);
+
         ImageView pause_image = (ImageView)findViewById(R.id.pause_image);
         pause.isClickable();
 
@@ -414,12 +419,16 @@ public class navActivity extends AppCompatActivity
         });
 
 
+
+
+
+
         intent = (new Intent(getApplicationContext(), filterService.class));
 
+        filter_intent = (new Intent(getApplicationContext(), filterService.class));
 
 
-
-     //   Log.d("nightmode","  "+ isOnNightMode);
+        //   Log.d("nightmode","  "+ isOnNightMode);
         Log.d("is pause","  ");
 
 
@@ -626,6 +635,9 @@ public class navActivity extends AppCompatActivity
         progress_screendim = 40;
         //seekbar_screendim.setProgress(progress_screendim);
 
+        Log.d("ok","fir seew");
+
+
         if(sharedPreferences.getBoolean("appCrash", Boolean.parseBoolean(null)) && !isMyServiceRunning(filterService.class)){
             editor.putBoolean("isOnNightmode", false);
             editor.putBoolean("isPause", false);
@@ -641,6 +653,9 @@ public class navActivity extends AppCompatActivity
         if(sharedPreferences.getBoolean("isPause", Boolean.parseBoolean(null))){
             pause_text.setText("Cancel Pause");
             pause_text.setTextColor(Color.RED);
+        }else{
+            pause_text.setText("Pause for 1 minute");
+            pause_text.setTextColor(Color.BLACK);
         }
 
     }
